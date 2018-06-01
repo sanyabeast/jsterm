@@ -181,7 +181,7 @@
                 }, this);
 
                 this.tools.loop(vars, function(_var, a){
-                    string = string.replace(new RegExp("\\{{" + _var + "}}", "g"), this.tools.process(_var, settings) || "");
+                    string = string.replace(new RegExp("\\{{" + _var + "}}", "g"), this.tools.process(_var, settings) || "undefined");
                 }, this);
 
                 return string;
@@ -218,7 +218,11 @@
                 return result;
             },
             $strinigify : function(token){
-                return (token || "").toString();
+                try {
+                    return JSON.stringify(token);
+                } catch (err){
+                    return (token || "undefined").toString();
+                }
             },
             $output : function(type, args){
                 this.realConsole.log(type, args);
