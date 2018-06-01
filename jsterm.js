@@ -135,7 +135,12 @@
             },
             ".output-line" : {
                 "font-size" : "16px",
-                "padding" : "0 8px"
+                "padding" : "0 8px",
+                "min-height" : "32px",
+                "max-width" : "100%",
+                "overflow-x" : "hidden",
+                "text-overflow": "clip",
+                "white-space": "nowrap",
             },
             ".output-line.error" : {
                 "background" : "#ffc7c9"
@@ -212,20 +217,44 @@
         console : {
             $format : function(args){
                 var result = this.tools.listReplace(args, function(item, id){
-                    return this.console.$strinigify(item);
+                    if (item instanceof Error){
+                        return item;
+                    }
+
+                    return this.console.$stringify(item);
                 }, this).join(" ");
 
                 return result;
             },
-            $strinigify : function(token){
+            $stringify : function(token, noJSON){
                 try {
-                    return JSON.stringify(token);
+                    if (typeof token == "object" && noJSON !== true){
+                        var result = {};
+
+                        this.tools.loop(token, function(member, name){
+                            result[name] = this.console.$stringify(member, true);
+                        }, this);
+
+                        this.realConsole.log(result);
+                        result = JSON.stringify(result, null, "\t");
+
+                        if (result.length > 500){
+                            result = result.substring(0, 500) + "...";
+                        }
+
+                        return result;
+
+                    } else if (typeof token !== "function"){
+                        return JSON.stringify(token);                        
+                    } else {
+                        eturn (token || "undefined").toString();
+                    }
+
                 } catch (err){
                     return (token || "undefined").toString();
                 }
             },
             $output : function(type, args){
-                this.realConsole.log(type, args);
                 this.realConsole[type].apply(this.realConsole, args);
                 this.bodyElement.appendChild(this.tools.toDOM(this.tools.layout("output", {
                     classList : type,
