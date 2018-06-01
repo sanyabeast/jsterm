@@ -97,7 +97,8 @@
                 "border" : "1px solid #ccc",
                 "box-sizing": "border-box",
                 "font-family" : "monospace",
-                "overflow" : "auto"
+                "overflow" : "auto",
+                "background" : "#fff"
             },
             ".jsterm .body" : {
                 "width" : "100%",
