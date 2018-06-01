@@ -11,6 +11,14 @@
 }(this, function(){
 
     var JSTerm = function(){
+        this.state = {
+            code : "",
+            zoom : 1,
+            zoomMin : 0.2,
+            zoomMax : 4,
+            zoomStep : 0.2
+        };
+
         this.tools.loop(this.tools, function(member, name, list){
             if (typeof member == "function"){ list[name] = member.bind(this); }
         }, this);
@@ -21,13 +29,12 @@
 
         this.element = this.tools.toDOM(this.tools.layout("root"));
         this.bodyElement = this.element.querySelector(".body");
+        this.menuElement = this.element.querySelector(".menu");
         this.inputElement = this.tools.toDOM(this.tools.layout("input"));
         this.inputLine = this.inputElement.querySelector("input");
         this.element.appendChild(this.inputElement);
 
-        this.state = {
-            code : ""
-        };
+        this.setupMenu(this.menuElement);
 
         this.inputLine.addEventListener("input", function(){
             this.state.code = this.inputLine.value;
@@ -63,6 +70,21 @@
                 console.error(err);
             }
         },
+        setupMenu : function(element){
+            element.querySelector(".button.zoom-increase").addEventListener("click", function(evt){
+                if (this.state.zoom + this.state.zoomStep <= this.state.zoomMax){
+                    this.state.zoom += this.state.zoomStep;
+                    this.element.style.fontSize = this.state.zoom + "px";                    
+                }
+            }.bind(this));
+
+            element.querySelector(".button.zoom-decrease").addEventListener("click", function(evt){
+                if (this.state.zoom - this.state.zoomStep >= this.state.zoomMin){
+                    this.state.zoom -= this.state.zoomStep;
+                    this.element.style.fontSize = this.state.zoom + "px";                    
+                }
+            }.bind(this));
+        },
         addStyles : function(){
             var styleElement = document.createElement("style");
             styleElement.type = "text/css";
@@ -86,86 +108,6 @@
             }, this);
 
             return result;
-        },
-        styles : {
-            ".jsterm" : {
-                "display" : "flex",
-                "flex-direction" : "column",
-                "min-width" : "100px",
-                "min-height" : "100px",
-                "font-size" : "16px",
-                "border" : "1px solid #ccc",
-                "box-sizing": "border-box",
-                "font-family" : "monospace",
-                "overflow" : "auto",
-                "background" : "#fff"
-            },
-            ".jsterm .body" : {
-                "width" : "100%",
-                "display" : "flex",
-                "flex-direction" : "column",
-                "overflow" : "auto",
-                "flex-grow" : "1"
-            },
-            ".input-line, .output-line" : {
-                "height" : "32px",
-                "display" : "flex",
-                "flex-direction" : "row",
-                "align-items" : "center",
-                "flex-shrink" : "0"
-            },
-            ".input-line" : {
-                "width": "100%",
-                "background": "white",
-                "box-sizing": "border-box",
-                "padding": "0 8px",
-            },
-            ".input-line:before" : {
-                "content": "\">\"",
-                "font-family": "monospace",
-                "color": "#2196F3",
-                "font-weight": "bold",
-                "margin-right" : '8px'
-            },
-            ".input-line input" : {
-                "border" : "none",
-                "outline" : "none",
-                "font-size" : "16px",
-                "font-family" : "monospace"
-            },
-            ".output-line" : {
-                "font-size" : "16px",
-                "padding" : "0 8px",
-                "min-height" : "32px",
-                "max-width" : "100%",
-                "overflow-x" : "hidden",
-                "text-overflow": "clip",
-                "white-space": "nowrap",
-            },
-            ".output-line.error" : {
-                "background" : "#ffc7c9"
-            },
-            ".output-line.warn" : {
-                "background" : "#ffe4c7"
-            },  
-            ".output-line:last-child" : {
-                "border-bottom" : "1px solid #eaeaea"
-            }
-        },
-        layouts : {
-            root : [
-                "<div class=\"jsterm\">",
-                "   <div class=\"body\"></div>",
-                "</div>"
-            ],
-            output : [
-                "<div class=\"output-line {{classList}}\">{{outputContent}}</div>"
-            ],
-            input : [
-                "<div class=\"input-line\">",
-                "   <input type=\"text\">",
-                "</div>"
-            ]
         },
         tools : {
             join : function(){ Array.prototype.join.call(arguments, ""); },
@@ -237,11 +179,6 @@
 
                         this.realConsole.log(result);
                         result = JSON.stringify(result, null, "\t");
-
-                        if (result.length > 500){
-                            result = result.substring(0, 500) + "...";
-                        }
-
                         return result;
 
                     } else if (typeof token !== "function"){
@@ -276,7 +213,133 @@
             info : function(){
                 this.console.$output("info", Array.prototype.slice.apply(arguments));
             },
-        }
+        },
+        styles : {
+            ".jsterm" : {
+                "display" : "flex",
+                "flex-direction" : "column",
+                "min-width" : "100px",
+                "min-height" : "100px",
+                "font-size" : "16px",
+                "border" : "1px solid #ccc",
+                "box-sizing": "border-box",
+                "font-family" : "monospace",
+                "overflow" : "auto",
+                "background" : "#fff",
+                "font-size" : "1px"
+            },
+            ".jsterm .menu" : {
+                "height" : "32em",
+                "flex-shrink" : "0",
+                "display" : "flex",
+                "flex-direction" : "row",
+                "border-bottom": "1px solid #f7f7f7",
+                "justify-content": "flex-end",
+            },
+            ".jsterm .menu .button" : {
+                "height" : "2em",
+                "width" : "2em",
+                "font-size" : "16em",
+                "line-height": "2em",
+                "text-align" : "center",
+                "color": "#969696",
+                "font-weight" : "bold",
+                "border": "1px solid #f1f1f1",
+                "border-bottom" : "none",
+                "margin-left": "-1px",
+                "cursor": "pointer",
+                "box-sizing": "border-box",
+                "user-select" : "none"
+            },
+            ".jsterm .body" : {
+                "width" : "100%",
+                "display" : "flex",
+                "flex-direction" : "column",
+                "overflow" : "auto",
+                "flex-grow" : "1"
+            },
+            ".jsterm .input-line, .output-line" : {
+                "height" : "2em",
+                "display" : "flex",
+                "flex-direction" : "row",
+                "align-items" : "center",
+                "flex-shrink" : "0"
+            },
+            ".jsterm .input-line" : {
+                "width": "100%",
+                "background": "white",
+                "box-sizing": "border-box",
+                "padding": "0 8em",
+                "height" : "32em"
+            },
+            ".jsterm .input-line:before" : {
+                "content": "\">\"",
+                "font-family": "monospace",
+                "color": "#2196F3",
+                "font-weight": "bold",
+                "margin-right" : '0.5em',
+                "font-size" : "16em"
+            },
+            ".jsterm .input-line input" : {
+                "border" : "none",
+                "outline" : "none",
+                "font-size" : "16em",
+                "font-family" : "monospace",
+                "flex-grow" : "1"
+            },
+            ".jsterm .output-line" : {
+                "font-size" : "16em",
+                "padding" : "0 0.5em",
+                "min-height" : "2em",
+                "max-width" : "100%",
+                "overflow-x" : "hidden",
+                "white-space": "pre",
+                "height" : "auto"
+            },
+            ".jsterm .output-line:before" : {
+                "content": "\"<\"",
+                "font-family": "monospace",
+                "color": "#505050",
+                "font-weight": "bold",
+                "margin-right" : '0.5em',
+                "font-size" : "1em",
+                "align-self" : "flex-start",
+                "margin-top": "0.4em"
+            },
+            ".jsterm .output-line.error" : {
+                "background" : "#ffc7c9"
+            },
+            ".jsterm .output-line.warn" : {
+                "background" : "#ffe4c7"
+            },  
+            ".jsterm .output-line:last-child" : {
+                "border-bottom" : "1px solid #eaeaea"
+            }
+        },
+        layouts : {
+            root : [
+                "<div class=\"jsterm\">",
+                "   {{#menu}}",
+                "   <div class=\"body\"></div>",
+                "</div>"
+            ],
+            menu : [
+                "<div class=\"menu\">",
+                "   <div class=\"button prev\">⯅</div>",
+                "   <div class=\"button next\">⯆</div>",
+                "   <div class=\"button zoom-decrease\">-</div>",
+                "   <div class=\"button zoom-increase\">+</div>",
+                "</div>"
+            ],
+            output : [
+                "<div class=\"output-line {{classList}}\">{{outputContent}}</div>"
+            ],
+            input : [
+                "<div class=\"input-line\">",
+                "   <input type=\"text\">",
+                "</div>"
+            ]
+        },
     };
 
     return JSTerm;
