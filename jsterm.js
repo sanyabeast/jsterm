@@ -22,6 +22,7 @@
             zoomStep : 0.2,
             history : [],
             _historyPosition : 0,
+            connected : false,
             set historyPosition(v){
                 this._historyPosition = v;
                 this.code = _this.inputLine.value = this.history[v] || "";
@@ -59,7 +60,7 @@
         }.bind(this));
 
         this.realConsole = window.console;
-        window.console = new Proxy(window.console, {
+        this.fakeConsole = new Proxy(window.console, {
             get : function(console, prop){
                 return (typeof this.console[prop] == "function") ? this.console[prop] : console[prop];
             }.bind(this)
@@ -69,7 +70,20 @@
     };
     
     JSTerm.prototype = {
+        connect : function(){
+            this.state.connected = true;
+            window.console = this.fakeConsole;
+        },
+        diconnect : function(){
+            this.state.connected = false;
+            window.console = this.realConsole;
+        },  
         evalInput : function(){
+            if (!this.state.connected){
+                this.throwDisconnectionError();
+                return;
+            }
+
             var code = this.state.code;
             var saveCodeToHistory = this.state.saveCodeToHistory;
 
@@ -88,6 +102,9 @@
             if (saveCodeToHistory){
                 this.state.history.push(code);
             }
+        },
+        throwDisconnectionError : function(){
+            this.console.$output("error", ["JSTerm is not connected"]);
         },
         setupMenu : function(element){
             element.querySelector(".button.zoom-increase").addEventListener("click", function(evt){
