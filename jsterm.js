@@ -404,7 +404,7 @@
             ],
             input : [
                 "<div class=\"input-line\">",
-                "   <input type=\"text\">",
+                "   <input autocorrect=\"off\" autocapitalize=\"none\" type=\"text\">",
                 "</div>"
             ]
         },
