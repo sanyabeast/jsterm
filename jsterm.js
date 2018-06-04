@@ -22,7 +22,18 @@
             zoomStep : 0.2,
             history : [],
             _historyPosition : 0,
-            connected : false,
+            _connected : false,
+            set connected(v){
+                this._connected = v;
+                if (v){
+                    _this.element.classList.add("connected");
+                } else {
+                    _this.element.classList.remove("connected");
+                }
+            },
+            get connected(){
+                return this._connected;
+            },
             set historyPosition(v){
                 this._historyPosition = v;
                 this.code = _this.inputLine.value = this.history[v] || "";
@@ -78,6 +89,9 @@
             this.state.connected = false;
             window.console = this.realConsole;
         },  
+        toggleConnection : function(){
+            this.state.connected ? this.diconnect() : this.connect();
+        },
         evalInput : function(){
             if (!this.state.connected){
                 this.throwDisconnectionError();
