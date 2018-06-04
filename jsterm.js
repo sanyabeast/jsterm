@@ -11,12 +11,21 @@
 }(this, function(){
 
     var JSTerm = function(){
+        var _this = this;
+
         this.state = {
             code : "",
             zoom : 1,
-            zoomMin : 0.2,
+            zoomMin : 0.4,
             zoomMax : 4,
-            zoomStep : 0.2
+            zoomStep : 0.2,
+            history : [],
+            _historyPosition : 0,
+            set historyPosition(v){
+                this._historyPosition = v;
+                _this.code = _this.inputLine.value = this.history[v];
+            },
+            get historyPosition(){ return this._historyPosition }
         };
 
         this.tools.loop(this.tools, function(member, name, list){
@@ -63,12 +72,15 @@
                 return;
             }
 
+            this.state.historyPosition = 0;
             this.state.code = this.inputLine.value = "";
             try {
                 console.log(eval(code));
             } catch (err){
                 console.error(err);
             }
+
+            this.state.history.push(code);
         },
         setupMenu : function(element){
             element.querySelector(".button.zoom-increase").addEventListener("click", function(evt){
@@ -83,6 +95,16 @@
                     this.state.zoom -= this.state.zoomStep;
                     this.element.style.fontSize = this.state.zoom + "px";                    
                 }
+            }.bind(this));
+
+            element.querySelector(".button.prev").addEventListener("click", function(evt){
+                this.state.historyPosition--;
+                if (this.state.historyPosition < 0) this.state.historyPosition = this.state.history.length - 1;
+            }.bind(this));
+
+            element.querySelector(".button.next").addEventListener("click", function(evt){
+                this.state.historyPosition++;
+                if (this.state.historyPosition >= this.state.history.length) this.state.historyPosition = 0;
             }.bind(this));
         },
         addStyles : function(){
@@ -215,6 +237,39 @@
             },
         },
         styles : {
+            ".jsterm ::-webkit-scrollbar" : {
+              "width": "2px",
+              "height": "2px",
+            },
+            ".jsterm ::-webkit-scrollbar-button" : {
+              "width": "0px",
+              "height": "0px",
+            },
+            ".jsterm ::-webkit-scrollbar-thumb" : {
+              "background": "#e1e1e1",
+              "border": "0px none #ffffff",
+              "border-radius": "50px",
+            },
+            ".jsterm ::-webkit-scrollbar-thumb:hover" : {
+              "background": "#ffffff",
+            },
+            ".jsterm ::-webkit-scrollbar-thumb:active" : {
+              "background": "#000000",
+            },
+            ".jsterm ::-webkit-scrollbar-track" : {
+              "background": "#666666",
+              "border": "0px none #ffffff",
+              "border-radius": "50px",
+            },
+            ".jsterm ::-webkit-scrollbar-track:hover" : {
+              "background": "#666666",
+            },
+            ".jsterm ::-webkit-scrollbar-track:active" : {
+              "background": "#333333",
+            },
+            ".jsterm ::-webkit-scrollbar-corner" : {
+              "background": "transparent",
+            },
             ".jsterm" : {
                 "display" : "flex",
                 "flex-direction" : "column",
@@ -285,16 +340,27 @@
                 "outline" : "none",
                 "font-size" : "16em",
                 "font-family" : "monospace",
-                "flex-grow" : "1"
+                "flex-grow" : "1",
+                "height" : "100%",
+                "box-sizing" : "border-box"
             },
             ".jsterm .output-line" : {
                 "font-size" : "16em",
                 "padding" : "0 0.5em",
                 "min-height" : "2em",
+                "max-height" : "10em",
                 "max-width" : "100%",
                 "overflow-x" : "hidden",
+                "overflow-y" : "auto",
                 "white-space": "pre",
-                "height" : "auto"
+                "height" : "auto",
+                "border-bottom": "1px solid #f3f3f3",
+                "align-items" : "flex-start",
+                "position" : "relative",
+                "tab-size" : "2em"
+            },
+            ".jsterm .output-line p" : {
+                "margin" : "auto 0"
             },
             ".jsterm .output-line:before" : {
                 "content": "\"<\"",
@@ -304,7 +370,7 @@
                 "margin-right" : '0.5em',
                 "font-size" : "1em",
                 "align-self" : "flex-start",
-                "margin-top": "0.4em"
+                "margin-top": "0.4em",
             },
             ".jsterm .output-line.error" : {
                 "background" : "#ffc7c9"
@@ -325,14 +391,16 @@
             ],
             menu : [
                 "<div class=\"menu\">",
-                "   <div class=\"button prev\">⯅</div>",
-                "   <div class=\"button next\">⯆</div>",
+                "   <div class=\"button prev\">&#8593</div>",
+                "   <div class=\"button next\">&#8595</div>",
                 "   <div class=\"button zoom-decrease\">-</div>",
                 "   <div class=\"button zoom-increase\">+</div>",
                 "</div>"
             ],
             output : [
-                "<div class=\"output-line {{classList}}\">{{outputContent}}</div>"
+                "<div class=\"output-line {{classList}}\">",
+                "   <p>{{outputContent}}</p>",
+                "</div>"
             ],
             input : [
                 "<div class=\"input-line\">",
