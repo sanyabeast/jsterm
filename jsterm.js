@@ -115,7 +115,14 @@
 
             if (saveCodeToHistory){
                 this.state.history.push(code);
+                
+                if (this.onHistoryUpdated){
+                    this.onHistoryUpdated(this.state.history);
+                }
             }
+        },
+        putHistory : function(history){
+            this.state.history = history;
         },
         throwDisconnectionError : function(){
             this.console.$output("error", ["JSTerm is not connected"]);
