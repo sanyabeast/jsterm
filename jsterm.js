@@ -335,10 +335,11 @@
                 "overflow" : "auto",
                 "background" : "#fff",
                 "font-size" : "1px",
-                "-webkit-tap-highlight-color": "transparent"
+                "-webkit-tap-highlight-color": "transparent",
+                "z-index" : "9999"
             },
             ".jsterm .menu" : {
-                "height" : "32em",
+                "height" : "32px!important",
                 "flex-shrink" : "0",
                 "display" : "flex",
                 "flex-direction" : "row",
@@ -347,10 +348,10 @@
                 "background": "#f3f3f3"
             },
             ".jsterm .menu .button" : {
-                "height" : "32em",
-                "width" : "32em",
+                "height" : "32px!important",
+                "width" : "32px!important",
                 "text-align" : "center",
-                "color": "#969696",
+                "color": "#969696!important",
                 "font-weight" : "bold",
                 "border-left": "1px dotted #adadad",
                 "margin-left": "-1px",
@@ -363,7 +364,8 @@
             },
             ".jsterm .menu .button p" : {
                 "margin" : "0",
-                "font-size" : "24em",
+                "font-size" : "24px!important",
+                "color" : "#000!important"
             },
             ".jsterm .body" : {
                 "width" : "100%",
@@ -373,41 +375,45 @@
                 "flex-grow" : "1"
             },
             ".jsterm .input-line, .output-line" : {
-                "height" : "2em",
+                "height" : "2px!important!important",
                 "display" : "flex",
                 "flex-direction" : "row",
                 "align-items" : "center",
                 "flex-shrink" : "0"
             },
+            ".jsterm .input-line, .output-line p" : {
+                "color" : "#000",
+            },
             ".jsterm .input-line" : {
                 "width": "100%",
                 "background": "white",
                 "box-sizing": "border-box",
-                "padding": "0 8em",
-                "height" : "32em"
+                "padding": "0 8px!important",
+                "height" : "32px!important"
             },
             ".jsterm .input-line:before" : {
                 "content": "\">\"",
                 "font-family": "monospace",
-                "color": "#2196F3",
+                "color": "#2196F3 !important",
                 "font-weight": "bold",
                 "margin-right" : '0.5em',
-                "font-size" : "16em"
+                "font-size" : "16px!important"
             },
             ".jsterm .input-line input" : {
                 "border" : "none",
                 "outline" : "none",
-                "font-size" : "16em",
+                "font-size" : "16px!important",
                 "font-family" : "monospace",
                 "flex-grow" : "1",
                 "height" : "100%",
-                "box-sizing" : "border-box"
+                "box-sizing" : "border-box",
+                "color" : "#000"
             },
             ".jsterm .output-line" : {
-                "font-size" : "16em",
-                "padding" : "0 0.5em",
-                "min-height" : "2em",
-                "max-height" : "10em",
+                "font-size" : "16px!important",
+                "padding" : "0 0.5px!important",
+                "min-height" : "32px!important",
+                "max-height" : "72px!important",
                 "max-width" : "100%",
                 "overflow-x" : "hidden",
                 "overflow-y" : "auto",
@@ -416,21 +422,22 @@
                 "border-bottom": "1px solid #f3f3f3",
                 "align-items" : "flex-start",
                 "position" : "relative",
-                "tab-size" : "2em"
+                "tab-size" : "2px!important"
             },
             ".jsterm .output-line p" : {
                 "margin" : "auto 0",
-                "user-select" : "auto"
+                "user-select" : "auto",
+                "font-size" : "14px!important"
             },
             ".jsterm .output-line:before" : {
                 "content": "\"<\"",
                 "font-family": "monospace",
-                "color": "#505050",
+                "color": "#505050!important",
                 "font-weight": "bold",
                 "margin-right" : '0.5em',
-                "font-size" : "1em",
+                "font-size" : "1px!important",
                 "align-self" : "flex-start",
-                "margin-top": "0.4em",
+                "margin-top": "0.4px!important",
             },
             ".jsterm .output-line.error" : {
                 "background" : "#ffc7c9"
